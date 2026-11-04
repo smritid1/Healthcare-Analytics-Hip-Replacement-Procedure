@@ -375,12 +375,8 @@ Based on the descriptive findings, the following areas may be considered for fur
 
 2. **Evaluate Discharge Planning:** Examine discharge planning processes for patients requiring home health services, skilled nursing facilities, and inpatient rehabilitation.
 
-3. **Investigate Cost Variation:** Conduct further analysis of hospitals with higher reported costs per discharge.
+3. **Consider Patient Severity:** Include severity and mortality-risk classifications when comparing hospital utilization and reported costs.
 
-4. **Consider Patient Severity:** Include severity and mortality-risk classifications when comparing hospital utilization and reported costs.
-
-5. **Improve Hospital Benchmarking:** Use appropriate minimum discharge-volume thresholds and case-mix adjustment when comparing hospital performance.
-
-6. **Support Data-Driven Decisions:** Use SQL analysis, Python visualizations, and Power BI dashboards to monitor healthcare utilization and financial indicators.
+4. **Support Data-Driven Decisions:** Use SQL analysis, Python visualizations, and Power BI dashboards to monitor healthcare utilization and financial indicators.
 
 These recommendations are intended to guide further investigation rather than prescribe clinical or operational changes based solely on this dataset.
