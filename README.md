@@ -1,688 +1,548 @@
 # Healthcare Analytics: Hip Replacement Procedures
 
+### Hospital Utilization, Patient Demographics, Length of Stay, and Financial Analysis
+
 ## Project Overview
 
-This project is a healthcare analytics case study. The objective was to analyze hospital efficiency across New York State for patients undergoing **elective hip replacement surgery**.
+This project analyzes New York State hospital inpatient discharge data for hip replacement procedures during 2016. The objective is to explore hospital utilization, patient demographics, length of stay (LOS), discharge patterns, hospital-level differences, and healthcare costs using SQL, Python, Jupyter Notebook, and Power BI.
 
-The project was developed around a fictional healthcare consulting company called **HealthStat**, which wanted to identify opportunities to improve hospital operational efficiency while maintaining high-quality patient care.
+The project combines data cleaning, exploratory data analysis, SQL querying, healthcare KPI calculations, hospital benchmarking, and interactive dashboard development to identify patterns and generate data-driven insights.
 
-The analysis focuses primarily on two key efficiency metrics:
+The analysis focuses on understanding healthcare service utilization and operational efficiency through discharge-level data.
 
-- **Average Length of Stay (LOS)**
-- **Average Cost per Discharge**
+## Project Objectives
 
-The project combines data modeling, data cleaning, exploratory data analysis, DAX calculations, hospital benchmarking, root-cause analysis, data visualization, and interactive dashboard design.
+- Analyze hospital discharge patterns for hip replacement procedures.
+- Explore patient demographics, including age group and gender.
+- Evaluate average and median length of stay across different patient groups.
+- Examine hospital utilization across health service areas and counties.
+- Compare hospital-level discharge volume, length of stay, and reported costs.
+- Analyze the relationship between severity of illness, mortality risk, length of stay, and reported costs.
+- Understand patient discharge disposition patterns.
+- Develop healthcare KPIs and interactive Power BI dashboards.
+- Generate insights that can support healthcare operational analysis and decision-making.
 
----
+## Tools and Technologies
 
-## Business Problem
+| Tool | Purpose |
+|---|---|
+| MySQL | Data querying, filtering, aggregation, and analysis |
+| Python | Data cleaning, analysis, and statistical exploration |
+| Jupyter Notebook | Exploratory data analysis and documentation |
+| Pandas | Data manipulation and analysis |
+| NumPy | Numerical operations |
+| Matplotlib | Data visualization |
+| Seaborn | Statistical data visualization |
+| Power BI | Interactive dashboard development |
+| DAX | Healthcare KPI calculations and measures |
+| GitHub | Project documentation and version control |
 
-Healthcare organizations continuously aim to improve operational efficiency without compromising the quality of patient care.
-HealthStat wanted to understand:
+## Dataset Overview
 
-1. Which hospitals have higher or lower Length of Stay compared with the statewide benchmark?
-2. Which hospitals have higher or lower average cost per discharge?
-3. Which hospitals are potential efficiency outliers?
-4. How can these findings be communicated effectively to healthcare stakeholders?
+The dataset contains hospital inpatient discharge records from New York State for the reporting year 2016.
 
----
+**Dataset source:** New York State Department of Health – Hospital Inpatient Discharges.
 
-# Healthcare Quality Framework
+The original dataset contains:
 
-Healthcare quality can be evaluated across six major domains:
+- **26,594** discharge records
+- **30** columns
+- Hospital, patient demographic, diagnosis, procedure, severity, discharge, and financial information
 
-1. **Safety**
-2. **Effectiveness**
-3. **Timeliness**
-4. **Patient-Centered Care**
-5. **Equity**
-6. **Efficiency**
+### Analytical Cohort
 
-This case study focuses specifically on the **Efficiency** domain.
+For this project, the analysis focuses on records matching the following criteria:
 
-### Efficiency
+- `apr_drg_code = 301`
+- `ccs_procedure_code = 153`
 
-Efficiency is concerned with avoiding unnecessary waste, including the waste of:
-
-- Equipment
-- Supplies
-- Ideas
-- Energy
-- Time
-- Other healthcare resources
-
-The project therefore evaluates hospital efficiency primarily through **Length of Stay** and **Cost per Discharge**.
-
----
-
-# Clinical Focus: Elective Hip Replacement
-
-The patient population analyzed in this case study consists of patients who received **elective hip replacement surgery**.
-
-Hip replacement is commonly performed for patients experiencing significant hip pain or joint damage, often associated with conditions such as arthritis.
-
-The procedure involves removing damaged bone and cartilage and replacing them with prosthetic components.
-
-Because hip replacement is an elective procedure, hospital efficiency can be evaluated by examining:
-
-- Patient Length of Stay
-- Hospital cost
-- Patient characteristics
-- Hospital characteristics
-- Procedure characteristics
-- Patient discharge disposition
-
----
-
-# Dataset Overview
-
-The dataset contains statewide hospital discharge information for **New York State** for one year.
-
-### Dataset characteristics
+After applying these filters, the selected analytical cohort contains:
 
 | Metric | Value |
 |---|---:|
-| Hospitals | **151** |
-| Discharges | **26K+** |
-| Columns | **30** |
-| Dataset structure | Single table |
-| Unit of analysis | One inpatient hospital stay |
-| Geographic coverage | New York State |
-| Main procedure | Elective hip replacement |
+| Original records | 26,594 |
+| Selected discharge records | 26,286 |
+| Distinct hospital facilities | 151 |
+| Distinct counties | 49 |
+| Reporting year | 2016 |
 
-Each row represents a single inpatient stay from admission through discharge.
+The selected cohort contains 26,286 discharge records. These records represent the analytical population used throughout the project.
 
-The dataset is de-identified and does not contain individually identifiable personal health information.
+All selected records have an admission type classified as **Elective**.
 
----
+## Dataset Features
 
-# Key Procedure Descriptions
+The dataset contains several categories of information.
 
-The two most frequently reported procedure descriptions were:
+### 1. Hospital Information
 
-1. **HIP REPLACEMENT, TOT/PRT**
-2. **OT OR THER PRC ON JOINT**
-
-The primary analytical focus of the case study is elective hip replacement surgery.
-
----
-
-# Important Healthcare Terminology
-
-### Inpatient
-
-A patient who has been admitted to a hospital bed for treatment or care.
-
-### Discharge
-
-The release of a patient from hospital care by a medical professional.
-
-### Disposition
-
-The patient's destination or status after being discharged from the hospital.
-
-Examples include:
-
-- Home
-- Skilled Nursing Home
-- Another healthcare facility
-- Other destinations
-
-### Elective Surgery
-
-A procedure that is planned in advance rather than performed because of an emergency.
-
-### Length of Stay (LOS)
-
-The total duration, measured in days, that a patient remains in the hospital during an inpatient stay.
-
----
-
-# Key Performance Indicators
-
-## 1. Average Length of Stay
-
-The statewide average Length of Stay was:
-
-### **2.65 days**
-
-This became an important benchmark for comparing hospitals and patient groups.
-
-A shorter LOS is generally desirable from an operational efficiency perspective because it can:
-
-- Reduce hospital costs
-- Release hospital bed capacity
-- Improve patient throughput
-- Allow hospitals to serve more patients
-
-However, a shorter LOS should not come at the expense of patient safety or quality of care.
-
----
-
-## 2. Average Cost per Discharge
-
-The project also introduced average cost per discharge as a second major efficiency metric.
-
-The metric was calculated as:
-
-**Average Cost per Discharge = Total Costs / Total Discharges**
-
-The statewide average cost per discharge was approximately:
-
-### **$21K**
-
-This value was used as a benchmark when comparing hospitals and geographic regions.
-
----
-
-# Hospital Analysis
-
-The analysis identified **151 hospitals** performing the procedure across New York State.
-
-## Hospitals by Health Service Area
-
-New York City had the highest number of hospitals in the dataset:
-
-- **44 hospitals**
-- **29.14% of all hospitals**
-
-This made New York City the largest health service area by hospital count.
-
----
-
-# Patient Population Analysis
-
-## Total Discharges
-
-The dataset contained approximately:
-
-### **26K total discharges**
-
----
-
-## Discharges by Gender
-
-The distribution of discharges was approximately:
-
-| Gender | Share of Discharges |
-|---|---:|
-| Female | **53.67%** |
-| Male | **46.33%** |
-
-Females represented a slightly larger share of total discharges.
-
-However, gender was later found to be **not a significant influencer of average LOS or cost per discharge**.
-
----
-
-## Discharges by Age Group and Gender
-
-The analysis examined:
-
-- Age 50–69
-- Age 70 or older
-
-and compared them by gender.
-
-The smallest group among patients aged 50 or older was:
-
-### **Male, Age 70 or older**
-
-This group represented:
-
-### **13.39% of total discharges**
-
-The next smallest group was:
-
-### **Female, Age 70 or older — 22.31%**
-
----
-
-# Length of Stay Analysis
-
-The statewide average LOS was:
-
-### **2.65 days**
-
-LOS was analyzed across multiple patient and hospital characteristics.
-
----
-
-## Average LOS for Males Aged 50+
-
-The average Length of Stay for males aged 50 or older was:
-
-### **2.53 days**
-
-This provides an example of how LOS can be analyzed across demographic groups.
-
----
-
-# Hospital Benchmarking
-
-The project compared hospitals based on:
-
-- Total discharge volume
-- Average LOS
-- Average cost per discharge
-- Percentage variation from statewide averages
-- Surgical program size
-- Number of surgeons
-
-This allowed hospitals to be benchmarked against the statewide average.
-
----
-
-# Top 15 Hospitals by Discharge Volume
-
-Among the top 15 hospitals by discharge volume, the hospital with the longest average LOS was:
-
-### **Syosset Hospital**
-
-Key metrics:
-
-- **Average LOS:** 3.22 days
-- **Number of surgeons:** 11
-
-This result motivated further investigation into the factors contributing to longer hospital stays.
-
----
-
-# Cost Analysis
-
-The Cost page of the Power BI report compares hospitals against the statewide average cost benchmark.
-
-### Statewide average cost per discharge
-
-**Approximately $21K**
-
-The report compares each hospital's:
-
-- Average Cost per Discharge
-- Percentage variation from the state average
-- Average LOS
-- Percentage variation from the state average
-
-This enables stakeholders to identify hospitals that are performing significantly above or below statewide benchmarks.
-
----
-
-# Cost by Health Service Area
-
-The health service area with the highest average cost per discharge was:
-
-### **New York City**
-
-Average cost per discharge:
-
-### **$25,502**
-
-This indicates that New York City hospitals had a higher average cost per discharge than the statewide benchmark.
-
----
-
-# Hospital with Highest Average Cost
-
-The hospital with the highest overall average cost per discharge was:
-
-### **NYU Lutheran Medical Center**
-
-Average cost per discharge:
-
-### **$84,601**
-
-This represents a significant difference from the statewide average of approximately $21K and makes the hospital an important candidate for further investigation.
-
-A high cost does not automatically indicate poor performance. Differences in patient complexity, severity, mortality risk, procedures, and resource requirements should be considered before concluding that a hospital is inefficient.
-
----
-
-# Hospital Comparison Analysis
-
-The Hospital Comparison page combines:
-
-- **Total Discharges**
-- **Average LOS Days**
-
-This allows hospitals to be evaluated based on both volume and efficiency.
-
-The report also displays:
-
-### **627 Total Surgeons**
-
-This provides additional context about the size of the surgical workforce across the analyzed hospitals.
-
----
-
-# Root Cause Analysis
-
-A major objective of the case study was to identify factors associated with differences in:
-
-- Average LOS
-- Average Cost per Discharge
-
-The analysis examined multiple explanatory variables.
-
-These included:
-
-- Age
-- Gender
-- Severity of illness
-- Risk of mortality
-- Diagnosis
-- Patient disposition
 - Health service area
-- Surgical program size
-- Hospital characteristics
+- Hospital county
+- Facility ID
+- Facility name
+- Operating certificate number
 
----
+### 2. Patient Demographics
 
-# Key Root Cause Findings
+- Age group
+- Gender
+- Race
+- Ethnicity
+- Three-digit ZIP code
 
-## 1. Age
+### 3. Diagnosis and Procedure Information
 
-Age was not identified as a significant influencer of:
+- CCS diagnosis code
+- CCS diagnosis description
+- CCS procedure code
+- CCS procedure description
+- APR-DRG code
+- APR-DRG description
+- APR-MDC code
+- APR-MDC description
+
+### 4. Healthcare and Discharge Information
+
+- Length of stay
+- Type of admission
+- Patient disposition
+- APR severity of illness
+- APR risk of mortality
+- APR medical/surgical description
+
+### 5. Provider and Financial Information
+
+- Attending provider license number
+- Operating provider license number
+- Total charges
+- Total costs
+
+## Healthcare Analytics Framework
+
+The project primarily focuses on **Healthcare Efficiency**.
+
+The analysis explores operational and financial indicators, including:
+
+- Average length of stay
+- Hospital discharge volume
+- Hospital utilization
+- Patient discharge disposition
+- Average reported cost per discharge
+- Hospital-level cost variation
+- Severity-related differences in resource utilization
+
+These indicators provide descriptive insights into hospital operations and resource utilization. They should not be interpreted as direct measures of clinical quality or patient outcomes.
+
+## Key Performance Indicators (KPIs)
+
+The following KPIs were calculated using the selected analytical cohort.
+
+| KPI | Result |
+|---|---:|
+| Total Discharges | 26,286 |
+| Total Hospitals | 151 |
+| Total Counties | 49 |
+| Average Length of Stay | 2.65 days |
+| Median Length of Stay | 2 days |
+| Average Reported Cost per Discharge | $20,910.35 |
+| Average Reported Charges per Discharge | $59,440.01 |
+| Aggregate Reported Costs | $549,649,448.36 |
+| Aggregate Reported Charges | $1,562,440,170.56 |
+| Major and Extreme Severity Share | 4.83% |
+
+**Important:** Total charges and total costs are different financial measures. Reported charges represent billed amounts, while reported costs represent the reported cost associated with providing care. Neither measure should automatically be interpreted as actual payments, reimbursements, or hospital profit.
+
+## Exploratory Data Analysis and Insights
+
+### 1. Patient Demographic Analysis
+
+The demographic analysis explores the distribution of hip replacement discharges across age groups and gender.
+
+#### Gender Distribution
+
+| Gender | Percentage of Discharges |
+|---|---:|
+| Female | 53.67% |
+| Male | 46.33% |
+
+Female patients account for a slightly higher share of discharge records than male patients.
+
+#### Age Group Distribution
+
+| Age Group | Percentage of Discharges |
+|---|---:|
+| 0–17 | 0.06% |
+| 18–29 | 0.62% |
+| 30–49 | 8.55% |
+| 50–69 | 58.37% |
+| 70 or Older | 32.41% |
+
+**Key Insight:**
+
+The majority of hip replacement discharge records belong to patients aged 50 and older. The 50–69 age group represents the largest share, followed by patients aged 70 or older.
+
+### 2. Geographic and Hospital Distribution
+
+The geographic analysis examines how hip replacement discharges are distributed across New York State health service areas and counties.
+
+Key findings:
+
+- The selected cohort includes 151 distinct hospital facilities.
+- These facilities are located across 49 counties.
+- New York City accounts for 44 facilities, representing approximately 29.14% of all facilities in the selected cohort.
+- New York City has the highest average reported cost per discharge among the health service areas, at approximately $25,502.36.
+
+**Key Insight:**
+
+Hospital facilities and reported costs vary across geographic areas. These differences provide opportunities for further investigation into regional healthcare utilization and cost patterns.
+
+### 3. Hospital Utilization Analysis
+
+Hospital utilization analysis examines discharge volume and operating-provider license identifiers across facilities.
+
+Key findings:
+
+- The dataset contains 26,286 selected discharge records.
+- There are 151 distinct hospital facilities.
+- There are 627 distinct operating-provider license identifiers.
+
+**Key Insight:**
+
+The dataset provides a hospital-level view of discharge activity and operating-provider identifiers. These identifiers should not be interpreted as a verified count of employed surgeons.
+
+### 4. Length of Stay (LOS) Analysis
+
+Length of stay measures the number of days patients remain hospitalized.
+
+The analysis evaluates average and median LOS across demographic groups, hospitals, patient disposition categories, and severity levels.
+
+#### Overall LOS
+
+| Metric | Result |
+|---|---:|
+| Average LOS | 2.65 days |
+| Median LOS | 2 days |
+| Aggregate LOS | 69,695 days |
+
+#### LOS by Gender
+
+| Gender | Average LOS |
+|---|---:|
+| Female | 2.77 days |
+| Male | 2.51 days |
+
+**Key Insight:**
+
+Female discharge records have a higher average length of stay than male discharge records in this cohort. This is a descriptive comparison and does not establish the reason for the difference.
+
+#### Hospital-Level LOS Comparison
+
+Among the 15 hospitals with the highest discharge volumes:
+
+- Syosset Hospital has the highest average LOS at approximately **3.22 days**.
+- It recorded 441 discharge records.
+- The dataset contains 11 distinct operating-provider license identifiers for this hospital.
+
+This comparison helps identify hospital-level differences in length of stay among higher-volume facilities.
+
+### 5. Patient Disposition Analysis
+
+Patient disposition describes the recorded destination or discharge status when a patient leaves the hospital.
+
+#### Discharge Distribution
+
+| Patient Disposition | Percentage |
+|---|---:|
+| Home with Home Health Services | 55.01% |
+| Home or Self Care | 20.50% |
+| Skilled Nursing Home | 19.30% |
+| Inpatient Rehabilitation Facility | 4.42% |
+
+**Key Insight:**
+
+More than half of the selected discharge records are associated with discharge to home with home health services.
+
+Patients discharged to skilled nursing homes have an average LOS of approximately **3.63 days**, which is higher than the overall cohort average of 2.65 days.
+
+This pattern may help identify differences in discharge planning and resource utilization.
+
+### 6. Severity of Illness Analysis
+
+The analysis examines the relationship between APR severity of illness classifications, average LOS, and reported costs.
+
+#### Severity-Level Comparison
+
+| Severity Level | Discharges | Average LOS (Days) | Average Reported Cost |
+|---|---:|---:|---:|
+| Minor | 11,735 | 2.37 | $20,335.44 |
+| Moderate | 13,282 | 2.67 | $20,603.29 |
+| Major | 1,195 | 4.58 | $27,578.21 |
+| Extreme | 74 | 12.45 | $59,515.79 |
+
+**Key Insights:**
+
+- Minor and moderate severity categories account for most discharge records.
+- Average LOS increases across the major and extreme severity categories.
+- Average reported costs are also higher in the major and extreme severity categories.
+- Extreme severity records have the highest average LOS and reported cost.
+
+These findings show descriptive differences across administrative severity classifications. They do not establish that severity alone causes higher costs or longer hospital stays.
+
+### 7. Risk of Mortality Analysis
+
+The dataset includes APR risk-of-mortality classifications.
+
+The analysis compares discharge volume, average LOS, and average reported costs across mortality-risk categories.
+
+| Risk of Mortality | Discharges | Average LOS (Days) | Average Reported Cost |
+|---|---:|---:|---:|
+| Minor | 22,407 | 2.45 | $20,324.53 |
+| Moderate | 3,298 | 3.36 | $22,606.33 |
+| Major | 488 | 5.88 | $31,388.39 |
+| Extreme | 93 | 9.54 | $46,929.96 |
+
+**Key Insight:**
+
+Average LOS and average reported costs are higher in the major and extreme mortality-risk categories than in the minor category.
+
+These are administrative risk classifications, not actual mortality outcomes.
+
+### 8. Healthcare Cost Analysis
+
+The financial analysis examines reported hospital costs and charges across facilities, health service areas, patient groups, and administrative classifications.
+
+#### Overall Financial Metrics
+
+| Metric | Amount |
+|---|---:|
+| Average Reported Cost per Discharge | $20,910.35 |
+| Average Reported Charges per Discharge | $59,440.01 |
+| Aggregate Reported Costs | $549,649,448.36 |
+| Aggregate Reported Charges | $1,562,440,170.56 |
+
+#### Geographic Cost Analysis
+
+New York City has the highest average reported cost per discharge among the health service areas, at approximately **$25,502.36**.
+
+#### Hospital-Level Cost Analysis
+
+NYU Lutheran Medical Center has the highest average reported cost per discharge among the hospitals in the selected cohort.
+
+| Metric | Value |
+|---|---:|
+| Hospital | NYU Lutheran Medical Center |
+| Average Reported Cost per Discharge | $84,601.41 |
+| Discharges | 124 |
+| County | Kings County |
+
+**Key Insight:**
+
+Reported costs vary across hospitals and geographic areas. These differences may reflect several factors, including patient characteristics, hospital operations, and resource utilization. Further case-mix-adjusted analysis would be required before drawing conclusions about hospital performance.
+
+### 9. Relationship Between Length of Stay and Reported Costs
+
+The project uses Spearman rank correlation to examine the relationship between length of stay and reported costs.
+
+| Statistical Measure | Result |
+|---|---:|
+| Spearman Correlation | 0.393 |
+
+**Key Insight:**
+
+The analysis identifies a positive association between length of stay and reported costs. In general, discharge records with longer hospital stays tend to have higher reported costs.
+
+However, correlation does not establish causation. This relationship does not prove that a longer stay directly causes higher costs.
+
+## SQL Analysis – MySQL
+
+The SQL component uses MySQL 8.0+ to perform structured data analysis and answer healthcare-related business questions.
+
+The SQL analysis includes:
+
+- Database and table creation
+- Data profiling
+- Data filtering and cohort selection
+- Data aggregation
+- Healthcare KPI calculations
+- Hospital-level analysis
+- Patient demographic analysis
+- Length-of-stay analysis
+- Cost and charges analysis
+- Severity and mortality-risk analysis
+- Patient disposition analysis
+- Hospital benchmarking
+- Common Table Expressions (CTEs)
+- Subqueries
+- Conditional aggregation
+- Window functions
+- Percentile and outlier screening
+- Dashboard-ready analytical queries
+
+The SQL file also contains English-language analytical questions followed by their corresponding SQL queries to support learning and practice.
+
+**SQL file:** `hip_replacement_healthcare_analytics_study_queries.sql`
+
+## Python and Jupyter Notebook Analysis
+
+The Python component performs data cleaning, exploratory data analysis, statistical analysis, and visualization.
+
+Libraries used:
+
+- Pandas
+- NumPy
+- Matplotlib
+- Seaborn
+- SciPy (optional)
+
+### Notebook Workflow
+
+1. Import required libraries.
+2. Load the original CSV dataset.
+3. Explore dataset structure and data types.
+4. Review the dataset's data dictionary.
+5. Perform data profiling and quality checks.
+6. Apply the analytical cohort filters.
+7. Calculate healthcare KPIs.
+8. Analyze patient demographics.
+9. Explore geographic and hospital distribution.
+10. Analyze length of stay.
+11. Examine reported costs and charges.
+12. Compare severity and mortality-risk categories.
+13. Analyze patient discharge disposition.
+14. Explore hospital-level differences.
+15. Perform outlier screening.
+16. Calculate Spearman correlation.
+17. Generate visualizations.
+18. Export analytical outputs.
+19. Document key findings and limitations.
+
+**Jupyter Notebook:** `us_healthcare_hip_replacement_data_analysis_final.ipynb`
+
+## Power BI Dashboard
+
+The Power BI report provides an interactive view of the healthcare analysis.
+
+The dashboard contains six report pages.
+
+### 1. Hospitals
+
+Focuses on hospital distribution and utilization.
+
+Visuals include:
+
+- Total hospitals
+- Hospitals by health service area
+
+### 2. Discharges
+
+Focuses on patient discharge demographics.
+
+Visuals include:
+
+- Total discharges
+- Gender distribution
+- Age group and gender distribution
+
+### 3. LOS
+
+Focuses on length-of-stay patterns.
+
+Visuals include:
 
 - Average LOS
-- Average Cost per Discharge
+- LOS by age group
+- LOS by gender
 
-Although LOS and cost may vary slightly between age groups, age was not identified as a major driver of efficiency differences in this analysis.
+### 4. Hospital Comparison
 
----
+Focuses on comparing hospital utilization and operational indicators.
 
-## 2. Gender
+Visuals include:
 
-Gender was also not identified as a significant influencer of:
+- Discharges by hospital
+- Hospital-level LOS
+- Distinct operating-provider license identifiers
 
-- Average LOS
-- Average Cost per Discharge
+### 5. Cost
 
-The discharge distribution showed slightly more female patients, but this did not translate into a meaningful difference in hospital efficiency.
+Focuses on hospital-level financial comparisons.
 
----
+Visuals include:
 
-## 3. Severity of Illness
+- Average cost per discharge
+- Average cost by health service area
+- Average cost by facility
+- Percentage variance from average cost
+- Average LOS and percentage variance
 
-### Extreme illness severity was a major influencer.
+### 6. Root Cause
 
-Patients with extreme illness severity were associated with:
+This page provides exploratory cost segmentation across different patient and hospital characteristics.
 
-- Higher Average LOS
-- Higher Average Cost per Discharge
+Visuals include:
 
-This is an important finding because patients with more severe conditions may require:
+- Average cost by mortality risk
+- Average cost by severity of illness
+- Average cost by diagnosis
+- Average cost by patient disposition
+- Average cost by gender
+- Average cost by age group
+- Average cost by health service area
 
-- Additional monitoring
-- More complex treatment
-- Greater resource utilization
-- Longer recovery periods
+The page is used for exploratory analysis. The visualizations identify patterns and differences but do not establish causal root causes.
 
-Therefore, patient complexity needs to be considered when benchmarking hospital efficiency.
+**Power BI file:** `9hospitals_overview.pbix`
 
----
-
-## 4. Risk of Mortality
-
-Extreme and major mortality risk were also identified as important factors associated with reduced efficiency.
-
-Higher mortality risk was associated with:
-
-- Higher LOS
-- Higher costs
-
-This suggests that patient case mix is an important consideration when evaluating hospital performance.
-
----
-
-## 5. Patient Disposition
-
-Patient disposition was another factor associated with LOS.
-
-Patients discharged to a:
-
-### **Skilled Nursing Home**
-
-had a higher average LOS than the statewide average of **2.65 days**.
-
-This may reflect differences in patient recovery requirements and post-hospital care needs.
-
-However, this is an association and should not automatically be interpreted as proof that disposition causes a longer stay.
-
----
-
-## 6. Health Service Area
-
-Hospitals located in:
-
-### **New York City**
-
-tended to have:
-
-- Higher average cost
-- Higher average LOS
-
-than many other areas of the state.
-
-This geographic variation was therefore considered relevant when investigating hospital efficiency.
-
----
-
-## 7. Surgical Program Size
-
-Surgical program size was also analyzed.
-
-Hospitals with a surgical program size of:
-
-### **400–599**
-
-were associated with approximately:
-
-### **$5.42K lower average cost per discharge**
-
-This may indicate potential economies of scale, where hospitals with larger surgical programs can potentially utilize:
-
-- Staff
-- Equipment
-- Operating rooms
-- Facilities
-- Administrative resources
-
-more efficiently.
-
-This finding represents an association rather than proof of causation.
-
----
-
-These visuals allow stakeholders to identify patterns and potential drivers of cost variation.
-
----
-
-# Dashboard Structure
-
-The final Power BI report contains several analytical pages.
-
-### **151 Total Hospitals**
-
-- New York City had the largest number of hospitals.
-- NYC accounted for **44 hospitals / 29.14%** of all hospitals.
-
----
-
-### **26K Total Discharges**
-
-- Female: **53.67%**
-- Male: **46.33%**
-- Male age 70+: **13.39% of total discharges**
-
----
-
-### **2.65 Average LOS Days**
-
-- Males aged 50+ had an average LOS of **2.53 days**.
-
----
-
-### **627 Total Surgeons**
-
----
-
-### **$21K Average Cost per Discharge**
-
-- NYC average cost per discharge: **$25,502**
-- Highest hospital average cost: **NYU Lutheran Medical Center — $84,601**
-
----
-
-# Major Business Insights
-
-The most important findings from the analysis are summarized below.
+## Key Findings
 
 | Area | Key Finding |
 |---|---|
-| Total Hospitals | **151** |
-| Total Discharges | **26K+** |
-| Total Surgeons | **627** |
-| State Average LOS | **2.65 days** |
-| State Average Cost | **~$21K** |
-| Largest Hospital Region | **New York City** |
-| NYC Hospitals | **44 / 29.14%** |
-| Smallest 50+ Patient Group | **Male 70+ — 13.39%** |
-| Female 70+ | **22.31%** |
-| Male 50+ Average LOS | **2.53 days** |
-| Highest LOS among Top 15 by Volume | **Syosset Hospital — 3.22 days** |
-| Surgeons at Syosset Hospital | **11** |
-| Highest-Cost Health Service Area | **New York City — $25,502** |
-| Highest-Cost Hospital | **NYU Lutheran Medical Center — $84,601** |
-| Surgical Program Size 400–599 | **~$5.42K lower average cost/discharge** |
-| Important LOS/Cost Influencer | **Extreme illness severity** |
-| Important LOS/Cost Influencer | **Extreme/Major mortality risk** |
-| LOS Influencer | **Skilled Nursing Home disposition** |
-| Weak Influencers | **Age and Gender** |
+| Patient Demographics | Patients aged 50 and older account for the majority of discharge records. |
+| Gender | Female discharge records represent 53.67% of the cohort. |
+| Hospital Distribution | The cohort includes 151 hospitals across 49 counties. |
+| Geographic Distribution | New York City accounts for 44 facilities. |
+| Length of Stay | Overall average LOS is 2.65 days. |
+| Patient Disposition | Home with Home Health Services represents 55.01% of discharges. |
+| Severity | Major and extreme severity categories have higher average LOS and reported costs. |
+| Mortality Risk | Average LOS and reported costs increase across the higher administrative risk categories. |
+| Healthcare Costs | Average reported cost per discharge is $20,910.35. |
+| Hospital Comparison | Syosset Hospital has the highest average LOS among the 15 highest-volume hospitals. |
+| Cost Variation | NYU Lutheran Medical Center has the highest average reported cost per discharge in the selected cohort. |
+| LOS and Cost | Spearman correlation indicates a positive association of approximately 0.393. |
 
----
+## Recommendations
 
-# Key Analytical Takeaways
+Based on the descriptive findings, the following areas may be considered for further healthcare operational investigation:
 
-### 1. Hospital efficiency varies significantly
+1. **Review Length-of-Stay Differences:** Investigate factors associated with higher LOS across hospitals and patient groups.
 
-There was substantial variation in both:
+2. **Evaluate Discharge Planning:** Examine discharge planning processes for patients requiring home health services, skilled nursing facilities, and inpatient rehabilitation.
 
-- Average LOS
-- Average cost per discharge
+3. **Investigate Cost Variation:** Conduct further analysis of hospitals with higher reported costs per discharge.
 
-between hospitals.
+4. **Consider Patient Severity:** Include severity and mortality-risk classifications when comparing hospital utilization and reported costs.
 
-This indicates that benchmarking can help identify potential opportunities for improvement.
+5. **Improve Hospital Benchmarking:** Use appropriate minimum discharge-volume thresholds and case-mix adjustment when comparing hospital performance.
 
----
+6. **Support Data-Driven Decisions:** Use SQL analysis, Python visualizations, and Power BI dashboards to monitor healthcare utilization and financial indicators.
 
-### 2. Patient complexity matters
+These recommendations are intended to guide further investigation rather than prescribe clinical or operational changes based solely on this dataset.
 
-Extreme illness severity and higher mortality risk were strongly associated with higher:
+## Project Files
 
-- LOS
-- Cost
+The repository contains the following project files:
 
-Therefore, hospitals should be compared while considering the complexity of the patients they treat.
+| File | Description |
+|---|---|
+| `hospital_inpatient_discharges_totalhipreplacement.csv` | Original hospital inpatient discharge dataset |
+| `hip_replacement_healthcare_analytics_study_queries.sql` | MySQL database queries and analytical questions |
+| `us_healthcare_hip_replacement_data_analysis_final.ipynb` | Python exploratory data analysis notebook |
+| `9hospitals_overview.pbix` | Interactive Power BI dashboard |
+| `README.md` | Project documentation |
 
----
+## How to Run the Project
 
-### 3. Geography matters
+### 1. Clone the Repository
 
-New York City hospitals tended to have higher:
-
-- Average cost
-- Average LOS
-
-than many other health service areas.
-
----
-
-### 4. Disposition is associated with LOS
-
-Patients discharged to skilled nursing homes had a higher average LOS than the statewide average.
-
-This highlights the importance of considering post-hospital care requirements when analyzing patient stays.
-
----
-
-### 5. Age and gender are not major efficiency drivers
-
-Although patient volumes differ across age and gender groups, these attributes were not identified as significant influencers of:
-
-- Average LOS
-- Average Cost per Discharge
-
----
-
-### 6. Surgical program size may be associated with lower costs
-
-The 400–599 surgical program size group showed approximately **$5.42K lower average cost per discharge**, suggesting that program scale may contribute to cost efficiency.
-
----
-
-# Business Recommendations
-
-Based on the analysis, healthcare stakeholders could consider the following areas for further investigation:
-
-### 1. Investigate high-LOS hospitals
-
-Hospitals with LOS significantly above the statewide average of **2.65 days** should be investigated to understand the operational and patient-related factors contributing to longer stays.
-
-### 2. Benchmark high-cost hospitals
-
-Facilities with substantially higher average costs should be examined for differences in:
-
-- Patient severity
-- Mortality risk
-- Diagnosis
-- Resource utilization
-- LOS
-- Surgical program characteristics
-
-### 3. Adjust benchmarking for patient complexity
-
-Hospitals treating more severe or higher-risk patients may naturally experience higher LOS and costs.
-
-Therefore, hospital benchmarking should consider patient case mix rather than evaluating cost alone.
-
-### 4. Investigate discharge planning
-
-The association between skilled nursing home disposition and higher LOS suggests that discharge planning and post-acute care pathways could be investigated further.
-
-### 5. Explore economies of scale
-
-The lower average cost associated with surgical program sizes of 400–599 suggests that hospital program scale may warrant further investigation.
-
-### 6. Focus improvement initiatives on meaningful drivers
-
-Since age and gender were not significant influencers, improvement initiatives should focus more heavily on factors such as:
-
-- Illness severity
-- Mortality risk
-- Patient disposition
-- Hospital characteristics
-- Geographic variation
-- Surgical program size
-
----
-
-# Important Analytical Consideration
-
-The findings in this project describe **associations and patterns in the dataset**.
-
-They should not automatically be interpreted as causal relationships.
-
-For example:
-
-> A higher illness severity is associated with higher cost.
-
-This does not necessarily mean that illness severity alone causes higher cost.
-
-Similarly:
-
-> Patients discharged to skilled nursing homes have higher LOS.
-
-This does not prove that the discharge destination itself causes longer hospital stays.
-
-Healthcare stakeholders should consider clinical context, patient case mix, and additional operational factors before making causal conclusions.
+```bash
+git clone <your-github-repository-url>
