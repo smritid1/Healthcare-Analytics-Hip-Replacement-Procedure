@@ -22,21 +22,6 @@ The analysis focuses on understanding healthcare service utilization and operati
 - Develop healthcare KPIs and interactive Power BI dashboards.
 - Generate insights that can support healthcare operational analysis and decision-making.
 
-## Tools and Technologies
-
-| Tool | Purpose |
-|---|---|
-| MySQL | Data querying, filtering, aggregation, and analysis |
-| Python | Data cleaning, analysis, and statistical exploration |
-| Jupyter Notebook | Exploratory data analysis and documentation |
-| Pandas | Data manipulation and analysis |
-| NumPy | Numerical operations |
-| Matplotlib | Data visualization |
-| Seaborn | Statistical data visualization |
-| Power BI | Interactive dashboard development |
-| DAX | Healthcare KPI calculations and measures |
-| GitHub | Project documentation and version control |
-
 ## Dataset Overview
 
 The dataset contains hospital inpatient discharge records from New York State for the reporting year 2016.
@@ -150,7 +135,7 @@ The following KPIs were calculated using the selected analytical cohort.
 | Aggregate Reported Charges | $1,562,440,170.56 |
 | Major and Extreme Severity Share | 4.83% |
 
-**Important:** Total charges and total costs are different financial measures. Reported charges represent billed amounts, while reported costs represent the reported cost associated with providing care. Neither measure should automatically be interpreted as actual payments, reimbursements, or hospital profit.
+**Important:** Total charges and total costs are different financial measures. Reported charges represent billed amounts, while reported costs represent the reported cost associated with providing care.
 
 ## Exploratory Data Analysis and Insights
 
@@ -355,143 +340,15 @@ However, correlation does not establish causation. This relationship does not pr
 
 ## SQL Analysis – MySQL
 
-The SQL component uses MySQL 8.0+ to perform structured data analysis and answer healthcare-related business questions.
-
-The SQL analysis includes:
-
-- Database and table creation
-- Data profiling
-- Data filtering and cohort selection
-- Data aggregation
-- Healthcare KPI calculations
-- Hospital-level analysis
-- Patient demographic analysis
-- Length-of-stay analysis
-- Cost and charges analysis
-- Severity and mortality-risk analysis
-- Patient disposition analysis
-- Hospital benchmarking
-- Common Table Expressions (CTEs)
-- Subqueries
-- Conditional aggregation
-- Window functions
-- Percentile and outlier screening
-- Dashboard-ready analytical queries
-
-The SQL file also contains English-language analytical questions followed by their corresponding SQL queries to support learning and practice.
-
-**SQL file:** `hip_replacement_healthcare_analytics_study_queries.sql`
+The SQL component uses structured data analysis and answer healthcare-related business questions.
 
 ## Python and Jupyter Notebook Analysis
 
 The Python component performs data cleaning, exploratory data analysis, statistical analysis, and visualization.
 
-Libraries used:
-
-- Pandas
-- NumPy
-- Matplotlib
-- Seaborn
-- SciPy (optional)
-
-### Notebook Workflow
-
-1. Import required libraries.
-2. Load the original CSV dataset.
-3. Explore dataset structure and data types.
-4. Review the dataset's data dictionary.
-5. Perform data profiling and quality checks.
-6. Apply the analytical cohort filters.
-7. Calculate healthcare KPIs.
-8. Analyze patient demographics.
-9. Explore geographic and hospital distribution.
-10. Analyze length of stay.
-11. Examine reported costs and charges.
-12. Compare severity and mortality-risk categories.
-13. Analyze patient discharge disposition.
-14. Explore hospital-level differences.
-15. Perform outlier screening.
-16. Calculate Spearman correlation.
-17. Generate visualizations.
-18. Export analytical outputs.
-19. Document key findings and limitations.
-
-**Jupyter Notebook:** `us_healthcare_hip_replacement_data_analysis_final.ipynb`
-
 ## Power BI Dashboard
 
 The Power BI report provides an interactive view of the healthcare analysis.
-
-The dashboard contains six report pages.
-
-### 1. Hospitals
-
-Focuses on hospital distribution and utilization.
-
-Visuals include:
-
-- Total hospitals
-- Hospitals by health service area
-
-### 2. Discharges
-
-Focuses on patient discharge demographics.
-
-Visuals include:
-
-- Total discharges
-- Gender distribution
-- Age group and gender distribution
-
-### 3. LOS
-
-Focuses on length-of-stay patterns.
-
-Visuals include:
-
-- Average LOS
-- LOS by age group
-- LOS by gender
-
-### 4. Hospital Comparison
-
-Focuses on comparing hospital utilization and operational indicators.
-
-Visuals include:
-
-- Discharges by hospital
-- Hospital-level LOS
-- Distinct operating-provider license identifiers
-
-### 5. Cost
-
-Focuses on hospital-level financial comparisons.
-
-Visuals include:
-
-- Average cost per discharge
-- Average cost by health service area
-- Average cost by facility
-- Percentage variance from average cost
-- Average LOS and percentage variance
-
-### 6. Root Cause
-
-This page provides exploratory cost segmentation across different patient and hospital characteristics.
-
-Visuals include:
-
-- Average cost by mortality risk
-- Average cost by severity of illness
-- Average cost by diagnosis
-- Average cost by patient disposition
-- Average cost by gender
-- Average cost by age group
-- Average cost by health service area
-
-The page is used for exploratory analysis. The visualizations identify patterns and differences but do not establish causal root causes.
-
-**Power BI file:** `9hospitals_overview.pbix`
 
 ## Key Findings
 
@@ -527,22 +384,3 @@ Based on the descriptive findings, the following areas may be considered for fur
 6. **Support Data-Driven Decisions:** Use SQL analysis, Python visualizations, and Power BI dashboards to monitor healthcare utilization and financial indicators.
 
 These recommendations are intended to guide further investigation rather than prescribe clinical or operational changes based solely on this dataset.
-
-## Project Files
-
-The repository contains the following project files:
-
-| File | Description |
-|---|---|
-| `hospital_inpatient_discharges_totalhipreplacement.csv` | Original hospital inpatient discharge dataset |
-| `hip_replacement_healthcare_analytics_study_queries.sql` | MySQL database queries and analytical questions |
-| `us_healthcare_hip_replacement_data_analysis_final.ipynb` | Python exploratory data analysis notebook |
-| `9hospitals_overview.pbix` | Interactive Power BI dashboard |
-| `README.md` | Project documentation |
-
-## How to Run the Project
-
-### 1. Clone the Repository
-
-```bash
-git clone <your-github-repository-url>
